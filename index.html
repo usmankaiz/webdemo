@@ -1,13 +1,9 @@
-<!-- Adapted from https://github.com/greggman/better-unity-webgl-template/blob/master/Assets/WebGLTemplates/BetterTemplate/index.html -->
-<!-- 26 June 2020 -->
 <!DOCTYPE html>
 <html lang="en-us">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Zap</title>
-    <script type="text/javascript" src="https://libs.zappar.com/zappar-cv/0.3.8/zappar-cv.js"></script>
+    <title>PoseEstimationWebGL</title>
     <style>
         html {
             box-sizing: border-box;
@@ -40,30 +36,37 @@
             z-index: 2;
         }
 
-        .progress {
-            margin: 1.5em;
-            border: 1px solid white;
-            width: 50vw;
-            display: none;
-        }
-
-        .progress .full {
-            margin: 2px;
-            background: white;
-            height: 1em;
-            transform-origin: top left;
-        }
-
         #loader {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100vw;
-            height: 100vh;
+            position: fixed;
+            z-index: 1000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+        .progress {
+            background-color: #d8d8d8;
+            border-radius: 20px;
+            position: relative;
+            margin: 15px 0;
+            height: 30px;
+            width: 300px;
+        }
+
+        .progress-done {
+            background: linear-gradient(to left, #707af2, #4050c7);
+            box-shadow: 0 3px 3px -5px #ffbb00, 0 2px 5px #ffbb00;
+            border-radius: 20px;
+            color: #fff;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100%;
+            width: 0;
+            opacity: 0;
+            transition: 1s ease 0.3s;
+            font-family: sans-serif;
         }
     </style>
 </head>
@@ -72,31 +75,31 @@
     <div id="gameContainer"></div>
     <div id="loader">
         <div class="progress">
-            <div class="full"></div>
+            <div class="progress-done" data-done="70">
+            </div>
         </div>
     </div>
 </body>
 
+
 <script src="Build/UnityLoader.js"></script>
 <script>
-    var gameInstance = UnityLoader.instantiate("gameContainer", "Build/FinalBuild.json", { onProgress: UnityProgress });
-    function UnityProgress(gameInstance, progress) {
-        if (!gameInstance.Module) {
-            return;
+    var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Build.json", {
+        onProgress: (gameInstance, progress) => {
+            if (!gameInstance.Module) {
+                return;
+            }
+            const loader = document.querySelector('.progress-done');
+
+            loader.style.width = loader.innerHTML = parseInt(progress * 100) + '%';
+            loader.style.opacity = 1;
+
+            if (progress == 1) {
+                document.querySelector(".progress").style.display = "none";
+            }
         }
-        const loader = document.querySelector("#loader");
-        if (!gameInstance.progress) {
-            const progress = document.querySelector("#loader .progress");
-            progress.style.display = "block";
-            gameInstance.progress = progress.querySelector(".full");
-        }
-        gameInstance.progress.style.transform = `scaleX(${progress})`;
-        if (progress === 1 && !gameInstance.removeTimeout) {
-            gameInstance.removeTimeout = setTimeout(function () {
-                loader.style.display = "none";
-            }, 0); // optionally set a delay in here.
-        }
-    }
+    });
 </script>
+<script src="./bundle.js"></script>
 
 </html>

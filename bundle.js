@@ -17,7 +17,6 @@ document.addEventListener('DOMNodeInserted', function (event) {
     const video = document.querySelector("video");
     video.addEventListener("loadeddata", function () {
       poseDetection.createDetector(poseDetection.SupportedModels.MoveNet).then(function (detector) {
-        window.posecamera = true;
         estimate(detector);
       });
     });
